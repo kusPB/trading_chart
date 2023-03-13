@@ -12,7 +12,46 @@ socket.onopen = function(e) {
 };
 
 socket.onmessage = function(event) {
-  console.log(`[message] Data received from server: ${event.data}`);
+  // console.log(`[message] Data received from server: ${event.data}`);
+  const data = JSON.parse(event.data);
+  const tradePrice = parseFloat(data.price);
+  const tradeTime = parseInt(data.timestamp);
+  const channelString = data.symbol;
+  if (data.status === 'error') {
+    // skip all non-TRADE events
+    return;
+  }
+  const subscriptionItem = channelToSubscription.get(channelString);
+  if (subscriptionItem === undefined) {
+    return;
+  }
+  const lastDailyBar = subscriptionItem.lastDailyBar;
+  const nextDailyBarTime = getNextDailyBarTime(lastDailyBar.time);
+
+  let bar;
+  if (tradeTime >= nextDailyBarTime) {
+    bar = {
+      time: nextDailyBarTime,
+      open: tradePrice,
+      high: tradePrice,
+      low: tradePrice,
+      close: tradePrice,
+    };
+    console.log("[socket] Generate new bar", bar);
+  } else {
+    bar = {
+      ...lastDailyBar,
+      high: Math.max(lastDailyBar.high, tradePrice),
+      low: Math.min(lastDailyBar.low, tradePrice),
+      close: tradePrice,
+    };
+    console.log("[socket] Update the latest bar by price", tradePrice);
+  }
+  subscriptionItem.lastDailyBar = bar;
+
+  // send data to every subscriber of that symbol
+  subscriptionItem.handlers.forEach((handler) => handler.callback(bar));
+  
 };
 
 socket.onclose = function(event) {
@@ -45,7 +84,7 @@ export function subscribeOnStream(
 ) {
   // const parsedSymbol = parseFullSymbol(symbolInfo.full_name);
   const channelString = symbolInfo.name;
-  console.log(symbolInfo, 'bunny');
+  // console.log(symbolInfo, 'bunny');
   const handler = {
     id: subscribeUID,
     callback: onRealtimeCallback,
@@ -63,16 +102,16 @@ export function subscribeOnStream(
     handlers: [handler],
   };
   channelToSubscription.set(channelString, subscriptionItem);
-  console.log(
-    "[subscribeBars]: Subscribe to streaming. Channel:",
-    channelString
-  );
-  socket.send(JSON.stringify({
-    "action": "subscribe",
-    "params": {
-    "symbols": `${symbolInfo.name}`
-    }
-  }));
+  // console.log(
+  //   "[subscribeBars]: Subscribe to streaming. Channel:",
+  //   channelString
+  // );
+  // socket.send(JSON.stringify({
+  //   "action": "subscribe",
+  //   "params": {
+  //   "symbols": `${symbolInfo.name}`
+  //   }
+  // }));
 }
 
 export function unsubscribeFromStream(subscriberUID) {
@@ -89,11 +128,16 @@ export function unsubscribeFromStream(subscriberUID) {
 
       if (subscriptionItem.handlers.length === 0) {
         // unsubscribe from the channel, if it was the last handler
-        console.log(
-          "[unsubscribeBars]: Unsubscribe from streaming. Channel:",
-          channelString
-        );
-        // socket.emit("SubRemove", { subs: [channelString] });
+        // console.log(
+        //   "[unsubscribeBars]: Unsubscribe from streaming. Channel:",
+        //   channelString
+        // );
+        socket.send(JSON.stringify({
+          "action": "unsubscribe",
+          "params": {
+          "symbols": `${channelString}`
+          }
+        }));
         channelToSubscription.delete(channelString);
         break;
       }

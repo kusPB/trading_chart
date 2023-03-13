@@ -2,14 +2,14 @@ import { makeApiRequest, generateSymbol, parseFullSymbol } from "./helpers.js";
 import { subscribeOnStream, unsubscribeFromStream } from "./streaming.js";
 
 const lastBarsCache = new Map();
-
+const twelveInterval = { "1":"1min", "5":"5min", "15":"15min" ,"30":"30min", "45":"45min" ,"60":"1hour", "120":"2hours", "240":"4hour", "1D":"1day", "1W":"1week", "1M":"1month" }
 const configurationData = {
-  supported_resolutions: ["1D", "1W", "1M"],
+  supported_resolutions: [ "1","5","15","30","45","60","120","240", "1D", "1W", "1M"],
   exchanges: [
     {
-      value: "NSE",
-      name: "NSE",
-      desc: "NSE",
+      value: "NASDAQ",
+      name: "NASDAQ",
+      desc: "NASDAQ",
     },
   ],
   symbols_types: [
@@ -24,7 +24,7 @@ const configurationData = {
 };
 
 async function getAllSymbols() {
-  const data = await makeApiRequest("stocks?exchange=NSE");
+  const data = await makeApiRequest("stocks?exchange=NASDAQ&show_plan=true");
       const symbols = data.data.map((data,index) => {
         return  {
           symbol: data.symbol,
@@ -103,16 +103,17 @@ const output =  {
     onHistoryCallback,
     onErrorCallback
   ) => {
+    console.log('123',resolution)
     const { from, to, firstDataRequest } = periodParams;
-    let start_date = new Date(from*1000);
     let end_date = new Date(to*1000);
     console.log("[getBars]: Method call", symbolInfo, resolution, from, to);
+    console.log("twelveInterval[resolution]", resolution);
     const urlParameters = {
       symbol: symbolInfo.name,
       type: 'stock',
-      interval:'1day',
+      interval:twelveInterval[resolution],
       exchange: symbolInfo.exchange,
-      outputsize: 2000,
+      outputsize: 100,
       // start_date:((start_date.getFullYear()<10)?'0':'')+start_date.getFullYear()+'-'+((start_date.getMonth()<9)?'0':'')+(start_date.getMonth()+1)+'-'+((start_date.getDay()<10)?'0':'')+start_date.getDay()+' '+((start_date.getHours()<10)?'0':'')+start_date.getHours()+':'+((start_date.getMinutes()<10)?'0':'')+start_date.getMinutes()+':'+((start_date.getSeconds()<10)?'0':'')+start_date.getSeconds(),
       end_date: ((end_date.getFullYear()<10)?'0':'')+end_date.getFullYear()+'-'+((end_date.getMonth()<9)?'0':'')+(end_date.getMonth()+1)+'-'+((end_date.getDate()<10)?'0':'')+end_date.getDate()+' '+((end_date.getHours()<10)?'0':'')+end_date.getHours()+':'+((end_date.getMinutes()<10)?'0':'')+end_date.getMinutes()+':'+((end_date.getSeconds()<10)?'0':'')+end_date.getSeconds()
     }
