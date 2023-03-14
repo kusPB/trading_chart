@@ -102,16 +102,16 @@ export function subscribeOnStream(
     handlers: [handler],
   };
   channelToSubscription.set(channelString, subscriptionItem);
-  // console.log(
-  //   "[subscribeBars]: Subscribe to streaming. Channel:",
-  //   channelString
-  // );
-  // socket.send(JSON.stringify({
-  //   "action": "subscribe",
-  //   "params": {
-  //   "symbols": `${symbolInfo.name}`
-  //   }
-  // }));
+  console.log(
+    "[subscribeBars]: Subscribe to streaming. Channel:",
+    channelString
+  );
+  socket.send(JSON.stringify({
+    "action": "subscribe",
+    "params": {
+    "symbols": `${symbolInfo.name}`
+    }
+  }));
 }
 
 export function unsubscribeFromStream(subscriberUID) {

@@ -7,9 +7,9 @@ const configurationData = {
   supported_resolutions: [ "1","5","15","30","45","60","120","240", "1D", "1W", "1M"],
   exchanges: [
     {
-      value: "NASDAQ",
-      name: "NASDAQ",
-      desc: "NASDAQ",
+      value: "NSE",
+      name: "NSE",
+      desc: "NSE",
     },
   ],
   symbols_types: [
@@ -24,7 +24,7 @@ const configurationData = {
 };
 
 async function getAllSymbols() {
-  const data = await makeApiRequest("stocks?exchange=NASDAQ&show_plan=true");
+  const data = await makeApiRequest("stocks?exchange=NSE&show_plan=true");
       const symbols = data.data.map((data,index) => {
         return  {
           symbol: data.symbol,
@@ -74,6 +74,7 @@ const output =  {
       onResolveErrorCallback("cannot resolve symbol");
       return;
     }
+    console.log('symbolitem',symbolItem)
     const symbolInfo = {
       ticker: symbolItem.full_name,
       name: symbolItem.symbol,
@@ -82,9 +83,10 @@ const output =  {
       session: "24x7",
       timezone: "Etc/UTC",
       exchange: symbolItem.exchange,
+      listed_exchange:symbolItem.exchange,
       minmov: 1,
       pricescale: 100,
-      has_intraday: false,
+      has_intraday: true,
       has_no_volume: true,
       has_weekly_and_monthly: false,
       supported_resolutions: configurationData.supported_resolutions,
@@ -114,7 +116,6 @@ const output =  {
       interval:twelveInterval[resolution],
       exchange: symbolInfo.exchange,
       outputsize: 100,
-      // start_date:((start_date.getFullYear()<10)?'0':'')+start_date.getFullYear()+'-'+((start_date.getMonth()<9)?'0':'')+(start_date.getMonth()+1)+'-'+((start_date.getDay()<10)?'0':'')+start_date.getDay()+' '+((start_date.getHours()<10)?'0':'')+start_date.getHours()+':'+((start_date.getMinutes()<10)?'0':'')+start_date.getMinutes()+':'+((start_date.getSeconds()<10)?'0':'')+start_date.getSeconds(),
       end_date: ((end_date.getFullYear()<10)?'0':'')+end_date.getFullYear()+'-'+((end_date.getMonth()<9)?'0':'')+(end_date.getMonth()+1)+'-'+((end_date.getDate()<10)?'0':'')+end_date.getDate()+' '+((end_date.getHours()<10)?'0':'')+end_date.getHours()+':'+((end_date.getMinutes()<10)?'0':'')+end_date.getMinutes()+':'+((end_date.getSeconds()<10)?'0':'')+end_date.getSeconds()
     }
       let query = Object.keys(urlParameters)
