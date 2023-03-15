@@ -40,11 +40,11 @@ function App() {
 
   return (
     <div className="App">
-      {/* <Header /> */}
+      <Header />
       <Routes>
           <Route index element={<Navigate to='/tradingchart' />} />
           <Route path = "tradingchart" element = { <TradingViewChart/> } />
-          {/* <Route path = "heatmap" element = { <HeatMap/> } /> */}
+          <Route path = "heatmap" element = { <HeatMap/> } />
       </Routes>
     </div>
   );

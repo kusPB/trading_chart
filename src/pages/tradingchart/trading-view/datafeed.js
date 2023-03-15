@@ -7,9 +7,9 @@ const configurationData = {
   supported_resolutions: [ "1","5","15","30","45","60","120","240", "1D", "1W", "1M"],
   exchanges: [
     {
-      value: "NSE",
-      name: "NSE",
-      desc: "NSE",
+      value: "NASDAQ",
+      name: "NASDAQ",
+      desc: "NASDAQ",
     },
   ],
   symbols_types: [
@@ -24,7 +24,7 @@ const configurationData = {
 };
 
 async function getAllSymbols() {
-  const data = await makeApiRequest("stocks?exchange=NSE&show_plan=true");
+  const data = await makeApiRequest("stocks?exchange=NASDAQ&show_plan=true");
       const symbols = data.data.map((data,index) => {
         return  {
           symbol: data.symbol,
