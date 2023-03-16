@@ -11,7 +11,7 @@ const TradingViewChart = () => {
     document.head.appendChild(script);
 
     window.tvWidget = new widget({
-      symbol: "NASDAQ:AAPL", // default symbol
+      symbol: "NSE:AUBANK", // default symbol
       interval: "1D", // default interval
       fullscreen: true, // displays the chart in the fullscreen mode
       container: "tv_chart_container",

@@ -1,22 +1,29 @@
 const { parseFullSymbol } = require("./helpers.js");
 // const WebSocket = require('ws');
-
-const socket = new WebSocket(`wss://ws.twelvedata.com/v1/quotes/price?apikey=94e90972c5b84ffba64257cd5d054710`);
+const socket = new WebSocket(`wss://test.lisuns.com:4576`);
+const password = "bc4824f9-3adc-49e4-95d5-fc1583660f66";
 const channelToSubscription = new Map();
-
-
+const Authenticate = () =>{
+  const message ={
+      MessageType: "Authenticate",
+      Password: password
+  }
+  const jsonmessage = JSON.stringify(message);
+  socket.send(jsonmessage);
+}
 socket.onopen = function(e) {
   console.log("[open] Connection established");
   console.log("Sending to server");
+  Authenticate();
   socket.send("My name is John");
 };
 
 socket.onmessage = function(event) {
   // console.log(`[message] Data received from server: ${event.data}`);
   const data = JSON.parse(event.data);
-  const tradePrice = parseFloat(data.price);
-  const tradeTime = parseInt(data.timestamp);
-  const channelString = data.symbol;
+  const tradePrice = parseFloat(data.SellPrice);
+  const tradeTime = parseInt(data.ServerTime);
+  const channelString = data.InstrumentIdentifier;
   if (data.status === 'error') {
     // skip all non-TRADE events
     return;
@@ -106,11 +113,11 @@ export function subscribeOnStream(
     "[subscribeBars]: Subscribe to streaming. Channel:",
     channelString
   );
-  socket.send(JSON.stringify({
-    "action": "subscribe",
-    "params": {
-    "symbols": `${symbolInfo.name}`
-    }
+
+  socket.send(JSON.stringify( {
+    MessageType: "SubscribeRealtime",
+    Exchange: "NSE",					//GFDL : Supported values : NSE (stocks), NSE_IDX (Indices), NFO (F&O), MCX & CDS (Currency)
+    InstrumentIdentifier: `${channelString}`		//GFDL : NIFTY-I always represents current month Futures. 
   }));
 }
 
@@ -132,14 +139,14 @@ export function unsubscribeFromStream(subscriberUID) {
         //   "[unsubscribeBars]: Unsubscribe from streaming. Channel:",
         //   channelString
         // );
-        socket.send(JSON.stringify({
-          "action": "unsubscribe",
-          "params": {
-          "symbols": `${channelString}`
-          }
-        }));
-        channelToSubscription.delete(channelString);
-        break;
+        // socket.send(JSON.stringify({
+        //   "action": "unsubscribe",
+        //   "params": {
+        //   "symbols": `${channelString}`
+        //   }
+        // }));
+        // channelToSubscription.delete(channelString);
+        // break;
       }
     }
   }

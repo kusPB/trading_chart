@@ -3,13 +3,24 @@ import { subscribeOnStream, unsubscribeFromStream } from "./streaming.js";
 
 const lastBarsCache = new Map();
 const twelveInterval = { "1":"1min", "5":"5min", "15":"15min" ,"30":"30min", "45":"45min" ,"60":"1hour", "120":"2hours", "240":"4hour", "1D":"1day", "1W":"1week", "1M":"1month" }
+const GFDLInterveal = { "1":{type:'Minute', value:1},
+                        "5":{type:'Minute', value:5},
+                        "15":{type:'Minute', value:15},
+                        "30":{type:'Minute', value:30},
+                        "60":{type:'Hour', value:1},
+                        "120":{type:'Hour', value:2},
+                        "240":{type:'Hour', value:4}, 
+                        "1D":{type:'Day', value:1},
+                        "1W":{type:'Week', value:1}, 
+                        "1M":{type:'Month', value:1} 
+                      }
 const configurationData = {
-  supported_resolutions: [ "1","5","15","30","45","60","120","240", "1D", "1W", "1M"],
+  supported_resolutions: [ "1","5","15","30","60","120","240", "1D", "1W", "1M"],
   exchanges: [
     {
-      value: "NASDAQ",
-      name: "NASDAQ",
-      desc: "NASDAQ",
+      value: "NSE",
+      name: "NSE",
+      desc: "NSE",
     },
   ],
   symbols_types: [
@@ -24,7 +35,7 @@ const configurationData = {
 };
 
 async function getAllSymbols() {
-  const data = await makeApiRequest("stocks?exchange=NASDAQ&show_plan=true");
+  const data = await makeApiRequest("stocks?exchange=NSE&show_plan=true");
       const symbols = data.data.map((data,index) => {
         return  {
           symbol: data.symbol,
@@ -121,6 +132,25 @@ const output =  {
       let query = Object.keys(urlParameters)
       .map((name) => `${name}=${(urlParameters[name])}`)
       .join("&");
+    // const query = { MessageType: "GetHistory",
+    //                 Periodicity: GFDLInterveal[resolution].type,				//GFDL : Supported values are : Tick, Minute, Hour, Day, Week, Month
+    //                 Period:GFDLInterveal[resolution].value,							//GFDL : Supported values : 1,2,3,4,5,10,12,15,20,30
+    //                 Exchange: symbolInfo.exchange,					//GFDL : Supported Values : NFO, NSE, NSE_IDX, CDS, MCX. Mandatory Parameter
+    //                 InstrumentIdentifier: symbolInfo.name,
+    //                 //isShortIdentifier: "true",					//GFDL : When using contractwise symbol like NIFTY20JULFUT, 
+    //                                       //this argument must be sent with value "true" 
+                                          
+    //                 //From: from,							//Start time of the History as per Epoch time (1st January 1970)
+    //                                       //Visit https://www.epochconverter.com/ to get formulae to convert human readable 
+    //                                       //time to Epoch and vice versa (scroll to end of their home page)
+                                          
+    //                                       //If you need entire possible history, send From value as 0
+                                          
+    //                 To: to,									//End time of the History as per Epoch. To request data till latest moment, 
+    //                                       //skip this argument or send time in Future (e.g. current time + 1 hour)
+                                          
+    //                 Max: 100			
+    //               }
     try {
       const data = await makeApiRequest(`time_series?${query}`);
       if (
