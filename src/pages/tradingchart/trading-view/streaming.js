@@ -8,8 +8,8 @@ const Authenticate = () =>{
       MessageType: "Authenticate",
       Password: password
   }
-  const jsonmessage = JSON.stringify(message);
-  socket.send(jsonmessage);
+   const jsonmessage = JSON.stringify(message);
+            socket.send(jsonmessage);
 }
 socket.onopen = function(e) {
   console.log("[open] Connection established");
@@ -134,19 +134,12 @@ export function unsubscribeFromStream(subscriberUID) {
       subscriptionItem.handlers.splice(handlerIndex, 1);
 
       if (subscriptionItem.handlers.length === 0) {
-        // unsubscribe from the channel, if it was the last handler
-        // console.log(
-        //   "[unsubscribeBars]: Unsubscribe from streaming. Channel:",
-        //   channelString
-        // );
-        // socket.send(JSON.stringify({
-        //   "action": "unsubscribe",
-        //   "params": {
-        //   "symbols": `${channelString}`
-        //   }
-        // }));
-        // channelToSubscription.delete(channelString);
-        // break;
+        socket.send(JSON.stringify( {
+          MessageType: "SubscribeRealtime",
+          Exchange: "NSE",					//GFDL : Supported values : NSE (stocks), NSE_IDX (Indices), NFO (F&O), MCX & CDS (Currency)
+          InstrumentIdentifier: `${channelString}`,		//GFDL : NIFTY-I always represents current month Futures. 
+          Unsubscribe:true
+        }));
       }
     }
   }
