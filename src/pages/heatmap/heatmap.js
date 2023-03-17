@@ -122,11 +122,11 @@ const HeatMap = () => {
         <>
           
             <div className = 'flex flex-row'>
-                {/* <div className = 'basis-1/6 md:bg-[#334155]  max-h-96 m-4 rounded-lg align-middle p-4 '>
+                <div className = 'basis-1/6 md:bg-[#334155]  max-h-96 m-4 rounded-lg align-middle p-4 '>
                     {sectors.map((sector,key) => (
                         <p key={key} className = 'text-lg text-white font-sans hover:text-purple-300 activce:text-purple-400' onClick={selectSector}>{sector}</p>
                     ))}
-                </div> */}
+                </div>
                 <div className = "grow grid 2xl:grid-cols-9 gap-4 p-4 lg:grid-cols-6 sm:grid-cols-3">
                     {  
                              (realData && keys.length>0)?keys.map((symbol,key) => (        

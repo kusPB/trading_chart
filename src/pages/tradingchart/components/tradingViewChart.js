@@ -25,7 +25,7 @@ const TradingViewChart = () => {
 
   return (
     <div id="fdsfsdf" style={{postion: 'relative'}}>
-      <div style={{position: 'absolute', bottom: '35px', left: '80px'}}><img src= {logo} alt="logo" width={80} height={50} /></div>
+      <div style={{position: 'absolute', bottom: '5px', left: '80px'}}><img src= {logo} alt="logo" width={80} height={50} style ={{backgroundColor:'#4b5563',borderRadius:'10px'}}/></div>
       <div id="tv_chart_container"></div>
     </div>
   );
