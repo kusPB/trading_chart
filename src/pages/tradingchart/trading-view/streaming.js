@@ -89,9 +89,7 @@ export function subscribeOnStream(
   onResetCacheNeededCallback,
   lastDailyBar
 ) {
-  // const parsedSymbol = parseFullSymbol(symbolInfo.full_name);
-  const channelString = symbolInfo.name;
-  // console.log(symbolInfo, 'bunny');
+  const channelString = symbolInfo.name;;
   const handler = {
     id: subscribeUID,
     callback: onRealtimeCallback,
@@ -117,7 +115,8 @@ export function subscribeOnStream(
   socket.send(JSON.stringify( {
     MessageType: "SubscribeRealtime",
     Exchange: "NSE",					//GFDL : Supported values : NSE (stocks), NSE_IDX (Indices), NFO (F&O), MCX & CDS (Currency)
-    InstrumentIdentifier: `${channelString}`		//GFDL : NIFTY-I always represents current month Futures. 
+    InstrumentIdentifier: `${channelString}`,		//GFDL : NIFTY-I always represents current month Futures. 
+    Unsubscribe:false
   }));
 }
 
@@ -134,12 +133,19 @@ export function unsubscribeFromStream(subscriberUID) {
       subscriptionItem.handlers.splice(handlerIndex, 1);
 
       if (subscriptionItem.handlers.length === 0) {
+         //unsubscribe from the channel, if it was the last handler
+        console.log(
+          "[unsubscribeBars]: Unsubscribe from streaming. Channel:",
+          channelString
+        );
         socket.send(JSON.stringify( {
           MessageType: "SubscribeRealtime",
           Exchange: "NSE",					//GFDL : Supported values : NSE (stocks), NSE_IDX (Indices), NFO (F&O), MCX & CDS (Currency)
           InstrumentIdentifier: `${channelString}`,		//GFDL : NIFTY-I always represents current month Futures. 
           Unsubscribe:true
         }));
+        channelToSubscription.delete(channelString);
+        break;
       }
     }
   }

@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import Datafeed from "../trading-view/datafeed";
 // import TradingView from "../charting_library/charting_library.standalone";
 import {widget} from "../charting_library";
+import logo from "../../common/logo.png"
 
 const TradingViewChart = () => {
   useEffect(() => {
@@ -22,7 +23,12 @@ const TradingViewChart = () => {
     return () => script.remove();
   }, []); //eslint-disable-line
 
-  return <div id="tv_chart_container"></div>;
+  return (
+    <div id="fdsfsdf" style={{postion: 'relative'}}>
+      <div style={{position: 'absolute', bottom: '35px', left: '80px'}}><img src= {logo} alt="logo" width={80} height={50} /></div>
+      <div id="tv_chart_container"></div>
+    </div>
+  );
 };
 
 export default TradingViewChart;
